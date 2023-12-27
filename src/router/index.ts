@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 /* pages */
-import SignUpView from '../views/SignUpView.vue'
-import SignInView from '../views/SignInView.vue'
+import LoginView from '../views/LoginView.vue'
 import HomeView from '../views/HomeView.vue'
 /* vuefire */
 import { useCurrentUser, getCurrentUser } from 'vuefire'
@@ -16,7 +15,7 @@ const router = createRouter({
     {
       path: '/signin',
       name: 'signin',
-      component: SignInView,
+      component: LoginView,
       meta: {
         requiresAuth: false
       }
@@ -24,7 +23,7 @@ const router = createRouter({
     {
       path: '/signup',
       name: 'signup',
-      component: SignUpView,
+      component: LoginView,
       meta: {
         requiresAuth: false
       }
@@ -42,6 +41,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from) => {
   console.log('router from', from, ' \nto', to)
+
   if (to.meta.requiresAuth) {
     const currentUser = await getCurrentUser()
     console.log('currentUser', currentUser)
