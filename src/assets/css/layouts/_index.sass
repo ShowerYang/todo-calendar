@@ -1,6 +1,6 @@
 html, body
     height: 100%
-    
+
 all 
     box-sizing: border-box
 
@@ -10,3 +10,15 @@ all
     display: flex
     justify-content: center
     align-items: center
+
+/**
+ * 設定全域變數修改full-calendar的樣式設定
+ * https://fullcalendar.io/docs/css-customization     
+ */
+:root
+    --fc-border-color: #e9ebed80
+    --fc-daygrid-event-dot-width: 5px
+.fc-daygrid-day-number
+    color: grey
+.fc-daygrid-dot-event.fc-event-mirror, .fc-daygrid-dot-event:hover
+    background: unset

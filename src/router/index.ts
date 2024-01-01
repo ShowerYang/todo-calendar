@@ -44,7 +44,7 @@ router.beforeEach(async (to, from) => {
 
   if (to.meta.requiresAuth) {
     const currentUser = await getCurrentUser()
-    console.log('currentUser', currentUser)
+    // console.log('currentUser', currentUser)
     if (!currentUser) {
       return {
         path: '/signin',

@@ -17,9 +17,98 @@
         display: flex
         align-items: center
         padding: 0 18px
+
+    &__date-control
+        display: flex
+        align-items: center
+        & .q-btn, & .q-btn-group
+            border-radius: 8px
+    &__display-date
+        color: rgb(33, 33, 33)
+        font-weight: bold
+        font-size: 1rem
+        line-height: initial
+        white-space: nowrap
     &__user-block
         width: 60px
-        height: 100%        
-
+        height: 100%
     &__body
         height: calc(100% - 60px)
+    &__calendar-container
+        height: 100%
+    &__calendar
+        height: 100%
+
+.calendar-event
+    width: 100%
+    display: flex
+    justify-content: space-between
+    align-items: center
+    padding: 4px 8px
+    border-radius: 4px
+    background-color: rgb(250, 250, 250)
+    transition: background-color 150ms ease-in-out 0s, box-shadow 150ms ease-in-out 0s, transform 150ms ease-in-out 0s
+    &:hover
+        background: rgb(255, 255, 255)
+        box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 
+        transform: translateY(-1px)
+    &__title
+        color: rgb(33, 33, 33)
+        font-weight: 500
+        line-height: initial
+    &__start-time
+        line-height: initial
+        color: rgb(143, 143, 143)
+        font-weight: normal
+        font-size: 12px
+
+.edit-dialog-card
+    max-width: 400px !important
+    width: 100%
+.edit-form
+    display: flex
+    flex-direction: column
+    &__group
+        display: flex
+        align-items: flex-start
+    &__group-title
+        // height: 40px
+        margin-right: 12px
+        display: flex
+        align-items: center
+    &__group-content
+        flex: 1
+        display: flex
+        align-items: center
+    &__date-input-wrapper
+        width: 160px
+    &__time-input-wrapper
+        // width: 120px
+        flex: 1
+.query-delete-popup
+    width: 150px
+    &__title
+        padding: 8px 10px
+        color: rgb(33, 33, 33)
+        font-size: 12px
+        font-weight: bold
+    &__btn-list
+        display: flex
+        flex-direction: column
+    &__btn
+        padding: 8px 0px
+        transition: background-color 0.2s ease 0s
+        cursor: pointer
+        &:hover
+            color: $main-background
+            background-color: rgba(134, 210, 216, 0.1)
+            & > span 
+                color: inherit
+                // font-weight: bold
+    &__btn-title
+        flex: 1 1 0%
+        padding: 0px 10px
+        color: rgb(143, 143, 143)
+        font-size: 12px
+        white-space: nowrap
+

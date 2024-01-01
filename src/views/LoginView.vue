@@ -224,15 +224,20 @@ const handleCreateUserWuthEmail = () => {
     return
   }
 
+  $q.loading.show({ message: '註冊中' })
   createUserWithEmailAndPassword(auth, email.value, password.value)
     .then((userCredential) => {
       const user = userCredential.user
       console.log(user)
+      router.push({ name: 'home' })
     })
     .catch((error) => {
       console.log(error)
       const errorCode = error.code
       const errorMessage = error.message
+    })
+    .finally(() => {
+      $q.loading.hide()
     })
 }
 
