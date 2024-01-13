@@ -6,7 +6,7 @@ all
 
 #app
     height: 100%
-    background-color: $main-background
+    background-color: $main-color
     display: flex
     justify-content: center
     align-items: center
@@ -22,3 +22,13 @@ all
     color: grey
 .fc-daygrid-dot-event.fc-event-mirror, .fc-daygrid-dot-event:hover
     background: unset
+.fc-h-event
+    background-color: unset
+    border: unset
+
+/**
+ * 覆寫Quasar樣式  
+ */
+.q-layout__section--marginal
+    background-color: unset !important
+    color: unset !important

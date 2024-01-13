@@ -1,6 +1,6 @@
 <template>
-  <div class="home-view">
-    <div class="home-view__header">
+  <q-layout view="hHh lpR fFf" class="home-view">
+    <q-header class="home-view__header bg-white">
       <div class="home-view__control-block">
         <!-- LOGO -->
         <div class="q-mr-lg">
@@ -9,7 +9,7 @@
         <!-- 行事曆控制 -->
         <div class="home-view__date-control">
           <div class="flex items-center q-mr-sm">
-            <q-btn outline color="grey-5" label="今天" @click="moveCalendarDate('today')">
+            <q-btn outline color="primary" label="今天" @click="moveCalendarDate('today')">
               <q-tooltip class="bg-black text-subtitle2">{{ todayBtnDisplayDate }}</q-tooltip>
             </q-btn>
           </div>
@@ -17,7 +17,7 @@
             <q-btn-group outline>
               <q-btn
                 outline
-                color="grey-5"
+                color="primary"
                 icon="arrow_left"
                 class="q-px-sm"
                 @click="moveCalendarDate('prev')"
@@ -26,7 +26,7 @@
               </q-btn>
               <q-btn
                 outline
-                color="grey-5"
+                color="primary"
                 icon="arrow_right"
                 class="q-px-sm"
                 @click="moveCalendarDate('next')"
@@ -62,31 +62,138 @@
           </q-menu>
         </q-avatar>
       </div>
-    </div>
-    <div class="home-view__body">
-      <div class="home-view__calendar-container">
-        <!-- 行事曆 -->
-        <FullCalendar ref="calendarRef" class="home-view__calendar" :options="calendarOptions">
-          <!-- <template v-slot:dayHeaderContent="arg">
-            <b>{{ arg.timeText }}</b>
-          </template> -->
-          <template v-slot:dayCellContent="arg">
-            <div>{{ arg.dayNumberText }}</div>
-          </template>
-          <template v-slot:eventContent="arg">
-            <div class="calendar-event" @click="handleEditDialog(arg.event.dateStr, arg.event)">
-              <div class="calendar-event__title">{{ arg.event.title }}</div>
-              <div class="calendar-event__start-time">
-                {{ arg.timeText }}
-              </div>
+    </q-header>
+    <!-- 行事曆 -->
+    <q-page-container class="home-view__calendar-container">
+      <FullCalendar ref="calendarRef" class="home-view__calendar" :options="calendarOptions">
+        <!-- <template v-slot:dayHeaderContent="arg">
+          <b>{{ arg.timeText }}</b>
+        </template> -->
+        <template v-slot:dayCellContent="arg">
+          <div
+            :class="{
+              'home-view__current-clicked-date': lastClickedDate === getDateStr(arg.date)
+            }"
+          >
+            {{ arg.dayNumberText }}
+          </div>
+        </template>
+        <template v-slot:eventContent="arg">
+          <div class="calendar-event" @click="handleClickDateEvent(arg.dateStr, arg.event)">
+            <div class="calendar-event__title">{{ arg.event.title }}</div>
+            <div class="calendar-event__start-time">
+              {{ arg.timeText }}
             </div>
-          </template>
-        </FullCalendar>
+          </div>
+        </template>
+      </FullCalendar>
+    </q-page-container>
+    <!-- 資訊視窗 -->
+    <q-drawer
+      ref="infoDrawerRef"
+      v-model="isInfoDrawerOpen"
+      side="right"
+      :width="400"
+      :overlay="false"
+    >
+      <div class="info-panel">
+        <div class="info-panel__header">
+          <div class="info-panel__btn">
+            <q-btn round flat color="primary" icon="close" @click="toggleInfoDrawer(false)"></q-btn>
+          </div>
+          <div class="info-panel__btn">
+            <q-btn round flat color="primary" icon="more_horiz">
+              <q-popup-proxy
+                ref="infoPopupProxyRef"
+                @before-show="
+                  () => {
+                    isPendingConfirmDelete = false
+                  }
+                "
+              >
+                <div class="popup-query-group">
+                  <!-- 操作選擇 -->
+                  <template v-if="!isPendingConfirmDelete">
+                    <div class="popup-query-group__btn-list">
+                      <div class="popup-query-group__btn" @click="handleClickEditEvent">
+                        <span>
+                          <q-icon name="edit"></q-icon>
+                        </span>
+                        <span class="popup-query-group__btn-title">編輯</span>
+                      </div>
+                      <div class="popup-query-group__btn" @click="handleClickDeleteEvent">
+                        <span>
+                          <q-icon name="delete"></q-icon>
+                        </span>
+                        <span class="popup-query-group__btn-title">刪除</span>
+                      </div>
+                    </div>
+                  </template>
+                  <!-- 確認是否刪除 -->
+                  <template v-else>
+                    <div class="popup-query-group__title">確定要刪除嗎?</div>
+                    <div class="popup-query-group__btn-list">
+                      <div class="popup-query-group__btn" @click.stop="confirmDeleteEvent">
+                        <span class="popup-query-group__btn-title">刪除</span>
+                      </div>
+                      <div class="popup-query-group__btn" @click="infoPopupProxyRef?.hide()">
+                        <span class="popup-query-group__btn-title">取消</span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </q-popup-proxy></q-btn
+            >
+          </div>
+        </div>
+        <div class="info-panel__attendees flex items-center">
+          <!-- 參與者 -->
+          <div class="info-panel__attendee">
+            <q-avatar
+              text-color="grey"
+              icon="account_circle"
+              font-size="40px"
+              class="cursor-pointer"
+            ></q-avatar>
+          </div>
+        </div>
+        <!-- 標題 -->
+        <div class="info-panel__event-title">
+          <div>{{ currentClickedEvent.title }}</div>
+        </div>
+        <!-- 時間起迄 -->
+        <div class="info-panel__event-dates">
+          <div class="info-panel__dates-block start">
+            <div class="info-panel__dates-date">{{ currentClickedEventStartDatetime.date }}</div>
+            <div class="info-panel__dates-time">
+              <span>{{ currentClickedEventStartDatetime.time }}</span>
+              <span class="info-panel__dates-time-period">{{
+                currentClickedEventStartDatetime.timePeriod
+              }}</span>
+            </div>
+          </div>
+          <div class="info-panel__dates-arrow">
+            <q-icon name="arrow_forward_ios" color="primary"></q-icon>
+          </div>
+          <div class="info-panel__dates-block">
+            <div class="info-panel__dates-date">{{ currentClickedEventEndDatetime.date }}</div>
+            <div class="info-panel__dates-time">
+              <span>{{ currentClickedEventEndDatetime.time }}</span>
+              <span class="info-panel__dates-time-period">{{
+                currentClickedEventEndDatetime.timePeriod
+              }}</span>
+            </div>
+          </div>
+        </div>
+        <!-- 備註 -->
+        <div class="info-panel__event-note">
+          <span>{{ currentClickedEvent.description }}</span>
+        </div>
       </div>
-    </div>
-  </div>
+    </q-drawer>
+  </q-layout>
   <!-- 編輯對話框 -->
-  <q-dialog v-model="isEditDailogActive">
+  <q-dialog v-model="isEditDailogOpen">
     <q-card class="edit-dialog-card">
       <q-card-section>
         <q-form ref="editForm" class="edit-form">
@@ -99,7 +206,7 @@
               <q-input
                 borderless
                 v-model="currentEditEvent.title"
-                placeholder="標題"
+                placeholder="請填寫標題"
                 style="font-size: 24px"
               />
             </div>
@@ -219,7 +326,7 @@
                 filled
                 type="textarea"
                 class="full-width"
-                placeholder="內容描述"
+                placeholder="備註"
               />
             </div>
           </div>
@@ -229,27 +336,14 @@
         <div class="flex items-center justify-between full-width">
           <div class="flex items-center">
             <!-- 刪除按鈕 -->
-            <q-btn
+            <!-- <q-btn
               outline
               color="red"
               icon="delete"
               style="padding: 4px 8px"
               v-if="currentEditEvent.id"
-            >
-              <q-popup-proxy ref="queryDeletePopupRef">
-                <div class="query-delete-popup">
-                  <div class="query-delete-popup__title">確定要刪除嗎?</div>
-                  <div class="query-delete-popup__btn-list">
-                    <div class="query-delete-popup__btn" @click="handleDeleteEvent">
-                      <span class="query-delete-popup__btn-title">刪除</span>
-                    </div>
-                    <div class="query-delete-popup__btn" @click="queryDeletePopupRef?.hide()">
-                      <span class="query-delete-popup__btn-title">取消</span>
-                    </div>
-                  </div>
-                </div>
-              </q-popup-proxy>
-            </q-btn>
+            >           
+            </q-btn> -->
           </div>
           <div class="flex items-center">
             <q-btn label="取消" outline color="primary" v-close-popup class="q-mr-md" />
@@ -267,16 +361,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import LogoWrapper from '@/components/LogoWrapper.vue'
 /* types */
 import type { ITodoEvent } from '@/types/todo-events'
+/* composables */
+import { useCommon } from '@/composables/useCommon'
 /* firebase */
 import { signOut } from 'firebase/auth'
 import { collection, doc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { useFirebaseAuth, useCurrentUser, useFirestore, useCollection, useDocument } from 'vuefire'
 /* quasar */
-import { useQuasar, date as qusarDateUtils, QPopupProxy } from 'quasar'
+import { useQuasar, date as qusarDateUtils, QPopupProxy, QDrawer } from 'quasar'
 /* full-calendar */
 // import '@fullcalendar/core/vdom'
 import FullCalendar from '@fullcalendar/vue3'
@@ -284,9 +380,15 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import zhtw from '@fullcalendar/core/locales/zh-TW'
-import type { CalendarOptions, EventSourceInput, EventInput } from '@fullcalendar/core'
+import type {
+  CalendarOptions,
+  EventSourceInput,
+  EventInput,
+  EventDropArg
+} from '@fullcalendar/core'
 import type { DateClickArg } from '@fullcalendar/interaction'
 
+const { getDayOfWeek, getTimePeriod } = useCommon()
 const $q = useQuasar()
 
 // #region 授權實體/資料庫連線實體
@@ -342,7 +444,7 @@ const calendarOptions = reactive<CalendarOptions>({
   // },
   initialView: 'dayGridMonth',
   // initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
-  editable: true,
+  editable: false,
   selectable: true,
   selectMirror: true,
   dayMaxEvents: true,
@@ -350,7 +452,13 @@ const calendarOptions = reactive<CalendarOptions>({
   events: [],
   dateClick: function (info: DateClickArg) {
     console.log(info)
-    handleEditDialog(info.dateStr, null)
+    if (lastClickedDate.value === info.dateStr) {
+      handleEditDialog(info.dateStr, null)
+    }
+    setLastClickedDate(info.dateStr)
+  },
+  eventDrop: function (info: EventDropArg) {
+    console.log(info)
   }
   // select: this.handleDateSelect,
   // eventClick: this.handleEventClick,
@@ -379,6 +487,7 @@ const todayBtnDisplayDate = computed(() => {
 const updateCurrentCalendarDate = () => {
   currentCalendarDate.value = calendarRef.value?.getApi().getDate()
 }
+
 /**
  * 移動行事曆日期
  * @param {string} action
@@ -414,10 +523,11 @@ watch(currentCalendarMode, (value: string) => {
  */
 const handleInsertCalendarEvents = (eventList: ITodoEvent[]) => {
   console.log('handleInsertCalendarEvents', eventList)
+  // 判斷是否為陣列(處理ts)
   if (Array.isArray(calendarOptions.events)) {
     const calendarOptionsEvents = calendarOptions.events as EventInput
     eventList.forEach((event: ITodoEvent) => {
-      // 處理資料內容
+      // 整理要加入的物件資料
       const data = {
         id: event.id,
         title: event.title,
@@ -425,7 +535,10 @@ const handleInsertCalendarEvents = (eventList: ITodoEvent[]) => {
         end: new Date(`${event.endDate} ${event.endTime}`),
         extendedProps: { ...event }
       }
-      // 透過id查找是否已存在事件
+      /**
+       * 透過id查找是否已存在事件
+       * 1. id: firestore自動產生的
+       */
       const findEvent = calendarOptionsEvents.find((evt: ITodoEvent) => evt.id === event.id)
       if (findEvent) {
         // 有找到=>更新資料
@@ -439,26 +552,49 @@ const handleInsertCalendarEvents = (eventList: ITodoEvent[]) => {
     $q.notify({ type: 'negative', message: '行事曆事件容器錯誤' })
   }
 }
-
 /**
- * 透過id刪除事件
- * @param {string} targetId
+ * 透過id查找並刪除事件
+ * @param {string} targetEventId 目標事件id
  */
-const deleteEventById = (targetId: string) => {
+const deleteEventById = (targetEventId: string) => {
   if (Array.isArray(calendarOptions.events)) {
     const calendarOptionsEvents = calendarOptions.events as EventInput
-    const eventIndex = calendarOptionsEvents.findIndex((evt: ITodoEvent) => evt.id === targetId)
+    const eventIndex = calendarOptionsEvents.findIndex(
+      (evt: ITodoEvent) => evt.id === targetEventId
+    )
     if (eventIndex !== -1) {
       calendarOptionsEvents.splice(eventIndex, 1)
     }
   }
+}
+
+/**
+ * 最後點擊的日期
+ */
+const lastClickedDate = ref<string>('')
+/**
+ * 設定最後點擊的日期
+ * @param {string} dateStr
+ */
+const setLastClickedDate = (dateStr: string) => {
+  lastClickedDate.value = dateStr
+}
+/**
+ * 取得日期字串(YYYY-MM-DD)
+ * @param {Date} date
+ */
+const getDateStr = (date: Date) => {
+  return qusarDateUtils.formatDate(date, 'YYYY-MM-DD')
 }
 // #endregion FullCalendar
 
 // #region 待辦事項
 // 目前使用者的待辦事項列表
 const currentUserEvents = useCollection(collection(db, `users/${currentUser.value?.uid}/events`))
-console.log(currentUserEvents)
+// console.log(currentUserEvents)
+/**
+ * 觀察異動: 目前使用者的待辦事項列表
+ */
 watch(
   currentUserEvents,
   (value) => {
@@ -468,7 +604,7 @@ watch(
 )
 
 // 是否編輯對話框開啟
-const isEditDailogActive = ref<boolean>(false)
+const isEditDailogOpen = ref<boolean>(false)
 // 預設內容
 const defaultEventContent = reactive({
   id: '',
@@ -523,7 +659,7 @@ const handleEditDialog = (dateStr: string, data: EventInput | null) => {
       description: ''
     })
   }
-  isEditDailogActive.value = true // 開啟對話框
+  isEditDailogOpen.value = true // 開啟對話框
 }
 /**
  * 處理點擊: 對話框確認
@@ -544,31 +680,151 @@ const handleClickDialogConfirm = async () => {
   // 判斷有無id(無=>新增)
   if (!currentEditEvent.id) {
     await addDoc(collection(db, `users/${currentUser.value?.uid}/events`), { ...documentData })
+    $q.notify({ type: 'positive', message: '新增成功' })
   } else {
     const targetEventRef = doc(db, `users/${currentUser.value?.uid}/events`, currentEditEvent.id)
     await updateDoc(targetEventRef, {
       ...documentData
     })
+    $q.notify({ type: 'positive', message: '更新成功' })
   }
   $q.loading.hide()
-  isEditDailogActive.value = false
-}
-
-// 詢問是否刪除的QPopupProxy實體參照
-const queryDeletePopupRef = ref<InstanceType<typeof QPopupProxy>>()
-/**
- * 處理刪除待辦事項
- */
-const handleDeleteEvent = async () => {
-  $q.loading.show({ message: '刪除中' })
-  await deleteDoc(doc(db, `users/${currentUser.value?.uid}/events`, currentEditEvent.id))
-  $q.loading.hide()
-  isEditDailogActive.value = false
-  deleteEventById(currentEditEvent.id)
+  isEditDailogOpen.value = false
 }
 // #endregion 待辦事項
 
+// #region 資訊視窗開啟
+const infoDrawerRef = ref<InstanceType<typeof QDrawer>>()
+// 是否資訊視窗開啟
+const isInfoDrawerOpen = ref<boolean>(false)
+/**
+ * 開關資訊視窗
+ * @param {boolean} status
+ */
+const toggleInfoDrawer = (status: boolean) => {
+  console.log('toggleInfoDrawer', status)
+  isInfoDrawerOpen.value = status
+  handleDrawerToggle()
+}
+// 開啟資訊視窗的定時器
+const drawerToggleInterval = ref<NodeJS.Timeout>()
+const stopDrawerToggleTimeout = ref<NodeJS.Timeout>()
+/**
+ * 處理資訊視窗的開關
+ */
+const handleDrawerToggle = () => {
+  if (drawerToggleInterval.value) {
+    clearInterval(drawerToggleInterval.value)
+  }
+  if (stopDrawerToggleTimeout.value) {
+    clearTimeout(stopDrawerToggleTimeout.value)
+  }
+
+  /**
+   * 設定interval定時執行更新FullCalendar的尺寸
+   * 1. 忽略效能問題，使其看起來流暢。
+   */
+  drawerToggleInterval.value = setInterval(() => {
+    calendarRef.value?.getApi().updateSize()
+  }, 1)
+  /**
+   * q-drawer開啟時的CSS transition是0.3秒，所以在那之後把定時更新的interval停止。
+   */
+  stopDrawerToggleTimeout.value = setTimeout(() => {
+    clearInterval(drawerToggleInterval.value)
+  }, 310)
+}
+// 詢問是否刪除的QPopupProxy實體參照
+const infoPopupProxyRef = ref<InstanceType<typeof QPopupProxy>>()
+// 目前點擊事件的日期字串
+const currentClickedEventDateStr = ref<string>('')
+// 目前點擊事件的內容(FullCalendar)
+const currentClickedEventInput = ref<EventInput | null>(null)
+// 目前點擊的事件
+const currentClickedEvent = reactive<ITodoEvent>({
+  ...defaultEventContent
+})
+// 目前點擊的事件: 開始日期時間
+const currentClickedEventStartDatetime = reactive({
+  date: '',
+  time: '',
+  timePeriod: ''
+})
+// 目前點擊的事件: 結束日期時間
+const currentClickedEventEndDatetime = reactive({
+  date: '',
+  time: '',
+  timePeriod: ''
+})
+
+/**
+ * 處理點擊日期事件
+ * @param {string} dateStr
+ * @param {EventInput} data
+ */
+const handleClickDateEvent = (dateStr: string, data: EventInput) => {
+  console.log('handleClickDateEvent', dateStr, data)
+
+  currentClickedEventDateStr.value = dateStr
+  currentClickedEventInput.value = data
+  // 設定開始日期時間
+  currentClickedEventStartDatetime.date = qusarDateUtils.formatDate(
+    data.start as Date,
+    'YYYY/M/D (ddd)'
+  )
+  // currentClickedEventStartDatetime.date += getDayOfWeek()
+  currentClickedEventStartDatetime.time = qusarDateUtils.formatDate(data.start as Date, 'h:mm')
+  currentClickedEventStartDatetime.timePeriod = getTimePeriod(
+    qusarDateUtils.formatDate(data.start as Date, 'A')
+  )
+  // 設定結束日期時間
+  currentClickedEventEndDatetime.date = qusarDateUtils.formatDate(
+    data.end as Date,
+    'YYYY/M/D (ddd)'
+  )
+  currentClickedEventEndDatetime.time = qusarDateUtils.formatDate(data.end as Date, 'h:mm')
+  currentClickedEventEndDatetime.timePeriod = getTimePeriod(
+    qusarDateUtils.formatDate(data.end as Date, 'A')
+  )
+
+  Object.assign(currentClickedEvent, { ...data.extendedProps, id: data.id })
+  toggleInfoDrawer(true)
+}
+
+/**
+ * 處理點擊: 編輯事件
+ */
+const handleClickEditEvent = () => {
+  handleEditDialog(currentClickedEventDateStr.value, currentClickedEventInput.value)
+  infoPopupProxyRef.value?.hide()
+}
+
+// 是否等待確認刪除
+const isPendingConfirmDelete = ref<boolean>(false)
+/**
+ * 處理點擊: 刪除事件
+ */
+const handleClickDeleteEvent = () => {
+  isPendingConfirmDelete.value = true
+}
+/**
+ * 處理刪除待辦事項
+ */
+const confirmDeleteEvent = async () => {
+  if (currentClickedEvent) {
+    $q.loading.show({ message: '刪除中' })
+    await deleteDoc(doc(db, `users/${currentUser.value?.uid}/events`, currentClickedEvent.id))
+    $q.loading.hide()    
+    toggleInfoDrawer(false)
+    infoPopupProxyRef.value?.hide()
+    deleteEventById(currentClickedEvent.id)
+    $q.notify({ type: 'positive', message: '刪除成功' })
+  }
+}
+// #endregion 資訊視窗開啟
+
 onMounted(() => {
+  // 頁面掛載後，先初始化顯示日期。
   updateCurrentCalendarDate()
 })
 </script>
