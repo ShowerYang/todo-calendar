@@ -1,46 +1,20 @@
 # todo-calendar
+### demo <br>
 
-This template should help get you started developing with Vue 3 in Vite.
+https://showeryang.github.io/todo-calendar/ <br>
 
-## Recommended IDE Setup
+### 說明
+起因是幫朋友做程式設計的作業，討論之後主題是自製一個行事曆。<br>
+之前已經有使用過 fullcalendar，所以選用此套件作為基底。<br>
+因為需要儲存資料，想說還沒有使用過 firebase，就打算邊做邊學。<br>
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+目前功能包含:<br>
+1. 註冊帳號(email + 密碼)，並且進行登入。<br>
+2. 待辦事項的新增(雙擊空白區塊) / 修改 / 刪除。<br>
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+### 使用技術及工具/套件
+Vite <br>
+fullcalendar <br>
+quasar <br>
+firebase <br>
+vuefire <br>
