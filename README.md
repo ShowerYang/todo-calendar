@@ -9,8 +9,8 @@ https://showeryang.github.io/todo-calendar/ <br>
 因為需要儲存資料，想說還沒有使用過 firebase，就打算邊做邊學。<br>
 
 目前功能包含:<br>
-註冊帳號(email + 密碼)，並且進行登入。<br>
-待辦事項的新增 / 修改 / 刪除。<br>
+1. 註冊帳號(email + 密碼)，並且進行登入。<br>
+2. 待辦事項的新增(雙擊空白區塊) / 修改 / 刪除。<br>
 
 ### 使用技術及工具/套件
 Vite <br>
