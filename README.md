@@ -14,6 +14,7 @@ https://showeryang.github.io/todo-calendar/ <br>
 
 ### 使用技術及工具/套件
 Vite <br>
+Vue 3 <br>
 fullcalendar <br>
 quasar <br>
 firebase <br>
